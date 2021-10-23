@@ -23,10 +23,10 @@
 	<div class="control-group">
 		<label class="control-label" for="tipoEmpresa"><?= JText::_('COM_CLASSIFICADOS_CAMPO_TIPO_EMPRESA') ?></label>
 		<div class="controls">
-			<select name="te" id="tipoEmpresa">
+			<select name="te" id="tipoEmpresa" style="max-width: 400px">
 				<option></option>
 <?php foreach($tiposEmpresa as $item) : ?>
-				<option value="<?= $item->id?>"><?= $item->nome?></option>
+				<option value="<?= $item->id?>"><?=  $item->nome . ' [' . $item->cnae . '] ' ?></option>
 <?php endforeach; ?>
 			</select>
 		</div>
@@ -36,9 +36,9 @@
 	<div class="control-group">
 		<label class="control-label" for="tipoProduto"><?= JText::_('COM_CLASSIFICADOS_CAMPO_TIPO_PRODUTO') ?></label>
 		<div class="controls">
-			<select name="tp" id="tipoProduto">
+			<select name="tp" id="tipoProduto" style="max-width: 400px">
 				<option></option>
-<?php foreach($tiposEmpresa as $item) : ?>
+<?php foreach($tiposProduto as $item) : ?>
 				<option value="<?= $item->id?>"><?= $item->nome?></option>
 <?php endforeach; ?>
 			</select>
@@ -47,15 +47,16 @@
 <?php endif; ?>
 	<div class="btn-toolbar text-right">
 		<div class="btn-group">
-			<button type="submit" id="btnBuscar" class="btn"><em class="icon-search"></em><?php
-				echo JText::sprintf('COM_CLASSIFICADOS_BTN_BUSCAR'); ?></button>
+			<button type="submit" id="btnBuscar" class="btn btn-primary"><?=
+				 JText::sprintf('COM_CLASSIFICADOS_BTN_BUSCAR_TEXT') .' ' . JText::sprintf('COM_CLASSIFICADOS_BTN_BUSCAR'); ?></button>
 
 
 		</div>
 	</div>
 
+<?php
 
-
-
+//echo JHtml::_('select.genericlist', $tiposProduto, "tp", 'style="max-width: 400px"', "id", "nome", $input->get('tp'));
+?>
 
 </form>

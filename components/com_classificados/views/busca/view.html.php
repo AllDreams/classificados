@@ -48,7 +48,8 @@ class ClassificadosViewBusca extends HtmlView
 	
 
 		$document->setMetadata('APPLICATION-NAME','Classidicados');
-		$descricao = JText::_('COM_CLASSIFICADOS_BUSCA_POR') . ($busca != null ? ' - ' . $busca : '' ) 
+		$descricao = JText::_('COM_CLASSIFICADOS_BUSCA_POR') 
+		. ($busca != null && $busca != ''? ' - ' . $busca : '' ) 
 		. ($tipoEmpresa != null ? ' [ ' . ucfirst($tipoEmpresa)  . ' ]': '' ) 
 		. ($tipoProduto != null ? ' [ ' . ucfirst($tipoProduto)   . ' ]': '' ) ;
 

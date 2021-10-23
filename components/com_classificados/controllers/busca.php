@@ -71,7 +71,7 @@ class ClassificadosControllerBusca extends BaseController
 
 		if($tipoEmpresa != null && $tipoEmpresa != 0 && $tipoEmpresa != ''){
 			$query = $db->getQuery ( true );
-			$query->select("`nome`")
+			$query->select("`nome`,`cnae`")
 				->from(ClassificadosControllerBusca::TB_TIPO_EMPRESA)
 				->where('`status`  = ' . $db->quote(ClassificadosControllerBusca::STATUS_ATIVO), 'AND')
 				->where('`id`  = ' . $db->quote($tipoEmpresa));
@@ -83,7 +83,7 @@ class ClassificadosControllerBusca extends BaseController
 		}
 
 		$query = $db->getQuery ( true );
-		$query->select("`nome`,`id`")
+		$query->select("`nome`,`cnae`,`id`")
 			->from(ClassificadosControllerBusca::TB_TIPO_EMPRESA)
 			->where('`status`  = ' . $db->quote(ClassificadosControllerBusca::STATUS_ATIVO), 'AND')
 			->order('`nome`');
@@ -101,9 +101,10 @@ class ClassificadosControllerBusca extends BaseController
 		$input->set( 'tiposProduto', $itens);
 
 
+
 		if($nome != null && trim($nome) != '' && (
-			($itensEmpresa  != null && sizeof($itensEmpresa->itens) > 0 )
-			($itensProduto != null && sizeof($itensProduto->itens) > 0 ))){
+			($itensEmpresa != null && $itensEmpresa->itens != null && ! empty($itensEmpresa->itens)  )
+			&& ($itensProduto != null && $itensProduto->itens != null && ! empty($itensProduto->itens)  ))){
 			$this->_salvarAcesso();
 			SearchHelper::logSearch($nome, 'com_classificados');
 		}
@@ -166,7 +167,7 @@ class ClassificadosControllerBusca extends BaseController
 		$db = JFactory::getDbo ();
 		$query = $db->getQuery ( true );
 		$query->select("`emp`.`id`, `pro`.`uuid`, `emp`.`nome_fantasia` AS nomeEmpresa, `emp`.`razao_social` as `razaoSocial`, 
-		`emp`.`id_tipo_empresa`, `tip`.`nome` AS `tipoEmpresa`, `tipp`.`nome` AS `tipoProduto`, `pro`.`nome` AS produto")
+		`emp`.`id_tipo_empresa`, `tip`.`nome` AS `tipoEmpresa`,`tip`.`cnae` AS `cnae`,  `tipp`.`nome` AS `tipoProduto`, `pro`.`nome` AS produto")
 			->from(ClassificadosControllerBusca::TB_PRODUTO . ' as `pro`')
 			->join('INNER', ClassificadosControllerBusca::TB_EMPRESA . ' as `emp` ON `pro`.`id_empresa` = `emp`.`id`')
 			->join('INNER', ClassificadosControllerBusca::TB_TIPO_EMPRESA . ' as `tip` ON `emp`.`id_tipo_empresa` = `tip`.`id` ')
