@@ -39,11 +39,7 @@ class ClassificadosControllerClassificadoss extends AdminController
 	 *
 	 * @since   1.0.0
 	 */
-	public function getModel(
-		$name = 'Classificados',
-		$prefix = 'ClassificadossModel',
-		$config = ['ignore_request' => true]
-	) {
+	public function getModel( $name = 'Classificados', $prefix = 'ClassificadossModel', $config = ['ignore_request' => true] ) {
 		return parent::getModel($name, $prefix, $config);
 	}
 }

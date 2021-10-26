@@ -14,6 +14,11 @@ use Joomla\CMS\Factory;
 use Joomla\CMS\Language\Text;
 use Joomla\CMS\MVC\Controller\BaseController;
 
+
+$doc = JFactory::getDocument();
+
+
+
 // Access check.
 if (!Factory::getUser()->authorise('core.manage', 'com_classificados'))
 {
@@ -22,6 +27,10 @@ if (!Factory::getUser()->authorise('core.manage', 'com_classificados'))
 
 // Require the helper
 require_once JPATH_COMPONENT_ADMINISTRATOR . '/helpers/classificados.php';
+
+
+
+
 
 // Execute the task
 $controller = BaseController::getInstance('classificados');

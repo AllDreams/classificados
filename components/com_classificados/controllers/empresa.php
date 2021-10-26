@@ -304,7 +304,7 @@ class ClassificadosControllerEmpresa extends BaseController
 		$pessoa = $db->loadObject();
 		$isCadastrado = !($pessoa == null || empty($pessoa) || $pessoa == '' || $pessoa->id == null ||  $pessoa->id == '' ||  $pessoa->id == 0 );
 
-		if($isCadastrado){
+		if(!$isCadastrado){
 
             
             $fields = array(

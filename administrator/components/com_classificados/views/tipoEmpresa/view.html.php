@@ -136,8 +136,6 @@ class ClassificadosViewClassificadoss extends HtmlView
 	 */
 	private function toolbar()
 	{
-
-		/*
 		ToolbarHelper::title(Text::_('COM_CLASSIFICADOS_CLASSIFICADOS'), '');
 
 		if ($this->canDo->get('core.create'))
@@ -174,6 +172,6 @@ class ClassificadosViewClassificadoss extends HtmlView
 		if (Factory::getUser()->authorise('core.admin', 'com_classificados'))
 		{
 			ToolbarHelper::preferences('com_classificados');
-		}*/
+		}
 	}
 }
