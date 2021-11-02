@@ -39,4 +39,14 @@ class ClassificadosHelper
 			$vName === 'classificadoss'
 		);
 	}
+
+	public function addTipoProduto($vName)
+	{
+		HTMLHelper::_(
+			'sidebar.addEntry',
+			Text::_('COM_CLASSIFICADOS'),
+			'index.php?option=com_classificados&task=tipoproduto',
+			$vName === 'classificadoss'
+		);
+	}
 }

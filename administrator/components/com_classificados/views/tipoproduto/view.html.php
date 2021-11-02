@@ -25,7 +25,7 @@ use Joomla\Registry\Registry;
  * @package  classificados
  * @since    1.0.0
  */
-class ClassificadosViewClassificadoss extends HtmlView
+class ClassificadosViewTipoproduto extends HtmlView
 {
 	/**
 	 * Array with profiles
@@ -108,11 +108,7 @@ class ClassificadosViewClassificadoss extends HtmlView
 	{
 		/** @var ClassificadosModelClassificadoss $model */
 		$model               = $this->getModel();
-		$this->items         = $model->getItems();
-		$this->state         = $model->getState();
-		$this->pagination    = $model->getPagination();
-		$this->filterForm    = $model->getFilterForm();
-		$this->activeFilters = $model->getActiveFilters();
+
 		$this->canDo         = ContentHelper::getActions('com_classificados');
 
 		// Show the toolbar
@@ -120,7 +116,7 @@ class ClassificadosViewClassificadoss extends HtmlView
 
 		// Show the sidebar
 		$this->helper = new ClassificadosHelper;
-		$this->helper->addSubmenu('classificadoss');
+		$this->helper->addTipoProduto('tipoproduto');
 		$this->sidebar = JHtmlSidebar::render();
 
 		// Display it all
@@ -136,31 +132,46 @@ class ClassificadosViewClassificadoss extends HtmlView
 	 */
 	private function toolbar()
 	{
+		$app = JFactory::getApplication();
+		//$document = JFactory::getDocument();
+		$input = $app->input;
+
+		ToolbarHelper::title(Text::_('COM_CLASSIFICADOS_TIPO_PRODUTO'), '');
+
+		ToolbarHelper::back();
+
+
+		if($input->get('layout') == 'form' ){
+		
+			ToolbarHelper::save('tipoproduto.gravar');
 
 
 
-		ToolbarHelper::title(Text::_('COM_CLASSIFICADOS_CLASSIFICADOS'), '');
+		}
+		else{
+			if ($this->canDo->get('core.create'))
+			{
+				ToolbarHelper::addNew('tipoproduto.carregarEditar');
+			}
+			
 
+			if ($this->canDo->get('core.edit') || $this->canDo->get('core.edit.own'))
+			{
+				ToolbarHelper::editList('tipoproduto.carregarEditar');
+				ToolbarHelper::trash('tipoproduto.remover');
+			}
+		}
+
+		/*if ($this->canDo->get('core.edit.state'))
+		{
+			ToolbarHelper::publish('classificadoss.publish', 'JTOOLBAR_PUBLISH', true);
+			ToolbarHelper::unpublish('classificadoss.unpublish', 'JTOOLBAR_UNPUBLISH', true);
+			ToolbarHelper::archiveList('classificadoss.archive');
+		}*/
 
 		
-		if ($this->canDo->get('core.create'))
-		{
-			ToolbarHelper::addNew('classificados.add');
-		}
 
-		if ($this->canDo->get('core.edit') || $this->canDo->get('core.edit.own'))
-		{
-			ToolbarHelper::editList('classificados.edit');
-		}
-
-		if ($this->canDo->get('core.edit.state'))
-		{
-			//ToolbarHelper::publish('classificadoss.publish', 'JTOOLBAR_PUBLISH', true);
-			//ToolbarHelper::unpublish('classificadoss.unpublish', 'JTOOLBAR_UNPUBLISH', true);
-			ToolbarHelper::archiveList('classificadoss.archive');
-		}
-
-		if ((int) $this->state->get('filter.published') === -2 && $this->canDo->get('core.delete'))
+/*		if ((int) $this->state->get('filter.published') === -2 && $this->canDo->get('core.delete'))
 		{
 			ToolbarHelper::deleteList(
 				'JGLOBAL_CONFIRM_DELETE',
@@ -177,6 +188,6 @@ class ClassificadosViewClassificadoss extends HtmlView
 		if (Factory::getUser()->authorise('core.admin', 'com_classificados'))
 		{
 			ToolbarHelper::preferences('com_classificados');
-		}
+		}*/
 	}
 }

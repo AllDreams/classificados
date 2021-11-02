@@ -11,6 +11,9 @@
 defined('_JEXEC') or die;
 
 use Joomla\CMS\MVC\Controller\AdminController;
+use Joomla\CMS\MVC\Controller\BaseController;
+use Joomla\CMS\Component\ComponentHelper;
+use Joomla\CMS\Helper\SearchHelper;
 
 /**
  * Classificadoss Controller.
@@ -18,18 +21,20 @@ use Joomla\CMS\MVC\Controller\AdminController;
  * @package  classificados
  * @since    1.0.0
  */
-class ClasificadosControllerTipoProduto extends AdminController
+class ClassificadosControllerTipoproduto extends AdminController
 {
 
 
 	const TB_TIPO_PRODUTO = '`#__tipo_produto`';
 	const TB_PRODUTO = '`#__produto`';
     const STATUS_ATIVO = 'A';
-
+    const STATUS_REMOVER = 'R';
 
 
 
     public function lista(){
+
+
         $db = JFactory::getDbo ();
 		$app = JFactory::getApplication();
 		$document = JFactory::getDocument();
@@ -41,18 +46,20 @@ class ClasificadosControllerTipoProduto extends AdminController
 
         $query = $db->getQuery ( true );
         $query->select('`t`.`nome`, `t`.`id`')
-            ->from(ClasificadosControllerTipoProduto::TB_TIPO_PRODUTO . ' AS t')
-            ->where('`t`.`status`  = ' . $db->quote(ClasificadosControllerTipoProduto::STATUS_ATIVO))
-			->where('AND', '`t`.`id_user_criador` = ' . $user->id);
+            ->from(ClassificadosControllerTipoproduto::TB_TIPO_PRODUTO . ' AS t')
+            ->where('`t`.`status`  = ' . $db->quote(ClassificadosControllerTipoproduto::STATUS_ATIVO))
+			->where( '`t`.`id_user_criador` = ' . $user->id);
         if($nome != null && ! empty($nome)){
-            $query->where('AND','upper(`t`.`nome`)  like ' . $db->quote(strtoupper(trim($tipoProduto )). '%'));
+            $query->where('upper(`t`.`nome`)  like ' . $db->quote(strtoupper(trim($tipoProduto )). '%'));
         }
         $query->order('t.nome');
+
+
         $db->setQuery ($query);
         $input->set( 'itens',$db->loadObjectList());
 
 
-        $input->set( 'view', 'tipoProduto' );
+        $input->set( 'view', 'tipoproduto' );
 		$input->set('layout', 'default' );
 		parent::display (true);
     }
@@ -61,6 +68,7 @@ class ClasificadosControllerTipoProduto extends AdminController
 		$db = JFactory::getDbo ();
 		$app = JFactory::getApplication();
 		$document = JFactory::getDocument();
+		$user = JFactory::getUser();
 		$input = $app->input;
 		if(!JSession::checkToken()){
 			JLog::add('Token inválido ao tentar remover tipo produto', JLog::DEBUG, 'com-classificado-tipoProduto');
@@ -72,35 +80,58 @@ class ClasificadosControllerTipoProduto extends AdminController
 
 
 
-        $id = $app->get('id', null, 'string', 'get');
+        $ids = $input->get('cid', array(), 'array');
 
+		print_r($ids);die();
+		foreach($ids as $id){
 
-		$query = $db->getQuery ( true );
-		$query->select("`nome`,`id`")
-			->from(ClasificadosControllerTipoProduto::TB_PRODUTO)
-			->where('`status`  = ' . $db->quote(ClassificadosControllerBusca::STATUS_ATIVO))
-            ->where('AND', '`id_tipo_produto` = ' . $db->quote($id))
-			->limit(1);
-		$db->setQuery ($query);
-		$item = $db->loadObject();
+			$query = $db->getQuery ( true );
+			$query->select("`nome`,`id`")
+				->from(ClassificadosControllerTipoproduto::TB_PRODUTO)
+				->where('`status`  = ' . $db->quote(ClassificadosControllerTipoproduto::STATUS_ATIVO))
+				->where('`id_tipo_produto` = ' . $db->quote($id))
+				->setLimit(1);
+			$db->setQuery ($query);
+			$item = $db->loadObject();
 
-		if($item){
-			JLog::add('Tentou remover um tipo de produto que já está em um uso por um produto.', JLog::DEBUG, 'com-classificado-tipoProduto');
-			$app->enqueueMessage(JText::_('COM_CLASSIFICADOS_TIPO_PRODUTO_EM_USO'), 'error');
-			$this->lista();
-			return;// Se o token expriou não valida o resto.
-		}
-
-		// Prepare the insert query.
-		$query
-		->delete($db->quoteName(ClasificadosControllerTipoProduto::TB_TIPO_PRODUTO))
-		->where('id = ')
-		->values(implode(',', $values));
+			if($item){
+				JLog::add('Tentou remover um tipo de produto que já está em um uso por um produto.', JLog::DEBUG, 'com-classificado-tipoProduto');
+				$app->enqueueMessage(JText::printf('COM_CLASSIFICADOS_TIPO_PRODUTO_EM_USO', $db->nome), 'error');
+			}
+			else{
+				// Prepare the insert query.
+				/*$query = $db->getQuery ( true );
+				$query
+				->delete($db->quoteName(ClassificadosControllerTipoproduto::TB_TIPO_PRODUTO))
+				->where('`id` = ' . $db->quote($id))
+				->values(implode(',', $values));
+					
+				// Set the query using our newly populated query object and execute it.
+				$db->setQuery($query);
+				$db->execute();*/
+				$fields = array(
+					$db->quoteName('status') . ' = ' . ClassificadosControllerTipoproduto::STATUS_REMOVER,
+	
+					//Campos de controle de alteração
+					$db->quoteName('id_user_alterador') . ' = ' . $db->quote($user->id),
+					$db->quoteName('ip_alterador') . ' = ' . $db->quote($_SERVER['REMOTE_ADDR']),
+					$db->quoteName('ip_alterador_proxiado') . ' = ' . $db->quote($_SERVER['HTTP_X_FORWARDED_FOR']),
+					$db->quoteName('data_alterado') . ' = NOW()' 
+				);
+				$conditions = array(
+					'  `id_criador` = ' . $user->id , 
+					'  `id` = ' .  $db->quote($id)          );
+	
+				
+				$query = $db->getQuery(true);
+				
+				$query->update(ClassificadosControllerTipoproduto::TB_TIPO_PRODUTO)->set($fields)->where($conditions);
+	
 			
-		// Set the query using our newly populated query object and execute it.
-		$db->setQuery($query);
-		$db->execute();
 
+				
+			}
+		}
 		$this->lista();
     }
 
@@ -117,10 +148,10 @@ class ClasificadosControllerTipoProduto extends AdminController
 		if($id != null){
 			$query = $db->getQuery ( true );
 			$query->select("`nome`,`id`")
-				->from(ClasificadosControllerTipoProduto::TB_TIPO_PRODUTO)
-				->where('`status`  = ' . $db->quote(ClassificadosControllerBusca::STATUS_ATIVO))
-				->where('AND', '`id` = ' . $db->quote($id))
-				->where('AND', '`id_user_criador` = ' . $user->id);
+				->from(ClassificadosControllerTipoproduto::TB_TIPO_PRODUTO)
+				->where('`status`  = ' . $db->quote(ClassificadosControllerTipoproduto::STATUS_ATIVO))
+				->where('`id` = ' . $db->quote($id))
+				->where('`id_user_criador` = ' . $user->id);
 			
 			$db->setQuery ($query);
 			$item = $db->loadObject();
@@ -133,12 +164,12 @@ class ClasificadosControllerTipoProduto extends AdminController
 
 		}
 
-        $input->set( 'view', 'tipoProduto' );
+        $input->set( 'view', 'tipoproduto' );
 		$input->set('layout', 'form' );
 		parent::display (true);
 	}
 
-    public function adicionar(){
+    public function gravar(){
 		$db = JFactory::getDbo ();
 		$app = JFactory::getApplication();
 		$document = JFactory::getDocument();
@@ -160,6 +191,9 @@ class ClasificadosControllerTipoProduto extends AdminController
 		$id = $app->get('id', null, 'int', 'post');
 		
 
+		die($nome);
+
+		
 		if($nome==null || trim($nome) == '' || strlen(trim($nome)) < 3){
 			JLog::add('Não enviou o tipo produto ', JLog::DEBUG, 'com-classificados-tipo-produto');
 			$app->enqueueMessage(JText::_('COM_CLASSIFICADOS_NOME_TIPO_PRODUTO_OBRIGATORIO'), 'error');
@@ -169,11 +203,11 @@ class ClasificadosControllerTipoProduto extends AdminController
 
 		$query = $db->getQuery ( true );
 		$query->select("`nome`,`id`")
-			->from(ClasificadosControllerTipoProduto::TB_TIPO_PRODUTO)
-			->where('`status`  = ' . $db->quote(ClassificadosControllerBusca::STATUS_ATIVO))
-            ->where('AND', '`nome` = ' . $db->quote($nome));
+			->from(ClassificadosControllerTipoproduto::TB_TIPO_PRODUTO)
+			->where('`status`  = ' . $db->quote(ClassificadosControllerTipoproduto::STATUS_ATIVO))
+            ->where('`nome` = ' . $db->quote($nome));
 		if($id != null){
-			$query->where('AND', '`id` <> ' . $db->quote($id));
+			$query->where('`id` <> ' . $db->quote($id));
 		}
 		$db->setQuery ($query);
 		$item = $db->loadObject();
@@ -212,12 +246,12 @@ class ClasificadosControllerTipoProduto extends AdminController
 							$db->quote($_SERVER['REQUEST_URI']), 
 							$db->quote($_SERVER['REMOTE_ADDR']), 
 							$db->quote($_SERVER['HTTP_X_FORWARDED_FOR']), 
-							ClassificadosControllerBusca::STATUS_ATIVO,
+							ClassificadosControllerTipoproduto::STATUS_ATIVO,
 							'NOW()');
 			
 			// Prepare the insert query.
 			$query
-				->insert($db->quoteName(ClasificadosControllerTipoProduto::TB_TIPO_PRODUTO))
+				->insert($db->quoteName(ClassificadosControllerTipoproduto::TB_TIPO_PRODUTO))
 				->columns($db->quoteName($columns))
 				->values(implode(',', $values));
 			
@@ -244,7 +278,7 @@ class ClasificadosControllerTipoProduto extends AdminController
             
 			$query = $db->getQuery(true);
             
-			$query->update(ClasificadosControllerTipoProduto::TB_TIPO_PRODUTO)->set($fields)->where($conditions);
+			$query->update(ClassificadosControllerTipoproduto::TB_TIPO_PRODUTO)->set($fields)->where($conditions);
 
 		
             	

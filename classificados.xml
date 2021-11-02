@@ -48,7 +48,9 @@
 	<!-- Back-end files -->
 	<administration>
 		<!-- Menu entries -->
-		<menu view="classificadoss">COM_CLASSIFICADOS</menu>
+		<menu view="menu">COM_CLASSIFICADOS</menu>
+		<menu task="tipoproduto.lista">Tipo Produto</menu>
+		<menu task="tipoempresa.lista">Tipo Empresa</menu>
 		<submenu>
 			<!--
 				Note that all & must be escaped to &amp; for the file to be valid

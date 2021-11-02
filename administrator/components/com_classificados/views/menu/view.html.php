@@ -25,7 +25,7 @@ use Joomla\Registry\Registry;
  * @package  classificados
  * @since    1.0.0
  */
-class ClassificadosViewTipoProduto extends HtmlView
+class ClassificadosViewMenu extends HtmlView
 {
 	/**
 	 * Array with profiles
@@ -106,13 +106,7 @@ class ClassificadosViewTipoProduto extends HtmlView
 	 */
 	public function display($tpl = null)
 	{
-		/** @var ClassificadosModelClassificadoss $model */
-		$model               = $this->getModel();
-		$this->items         = $model->getItems();
-		$this->state         = $model->getState();
-		$this->pagination    = $model->getPagination();
-		$this->filterForm    = $model->getFilterForm();
-		$this->activeFilters = $model->getActiveFilters();
+		/** @var ClassificadosModelMenu $model */
 		$this->canDo         = ContentHelper::getActions('com_classificados');
 
 		// Show the toolbar
@@ -120,7 +114,7 @@ class ClassificadosViewTipoProduto extends HtmlView
 
 		// Show the sidebar
 		$this->helper = new ClassificadosHelper;
-		$this->helper->addSubmenu('classificadoss');
+		$this->helper->addSubmenu('menu');
 		$this->sidebar = JHtmlSidebar::render();
 
 		// Display it all
@@ -136,6 +130,8 @@ class ClassificadosViewTipoProduto extends HtmlView
 	 */
 	private function toolbar()
 	{
+
+		/*
 		ToolbarHelper::title(Text::_('COM_CLASSIFICADOS_CLASSIFICADOS'), '');
 
 		if ($this->canDo->get('core.create'))
@@ -150,28 +146,28 @@ class ClassificadosViewTipoProduto extends HtmlView
 
 		if ($this->canDo->get('core.edit.state'))
 		{
-			ToolbarHelper::publish('classificadoss.publish', 'JTOOLBAR_PUBLISH', true);
-			ToolbarHelper::unpublish('classificadoss.unpublish', 'JTOOLBAR_UNPUBLISH', true);
-			ToolbarHelper::archiveList('classificadoss.archive');
+			ToolbarHelper::publish('menu.publish', 'JTOOLBAR_PUBLISH', true);
+			ToolbarHelper::unpublish('menu.unpublish', 'JTOOLBAR_UNPUBLISH', true);
+			ToolbarHelper::archiveList('menu.archive');
 		}
 
 		if ((int) $this->state->get('filter.published') === -2 && $this->canDo->get('core.delete'))
 		{
 			ToolbarHelper::deleteList(
 				'JGLOBAL_CONFIRM_DELETE',
-				'classificadoss.delete',
+				'menu.delete',
 				'JTOOLBAR_EMPTY_TRASH'
 			);
 		}
 		elseif ($this->canDo->get('core.edit.state'))
 		{
-			ToolbarHelper::trash('classificadoss.trash');
+			ToolbarHelper::trash('menu.trash');
 		}
 
 		// Options button.
 		if (Factory::getUser()->authorise('core.admin', 'com_classificados'))
 		{
 			ToolbarHelper::preferences('com_classificados');
-		}
+		}*/
 	}
 }

@@ -46,7 +46,7 @@ $loggedInUser  = Factory::getUser();
 				</svg>
 			Tabela de preços
 		</a>
-		<a href="#" class="btn btn-primary">
+		<a href="<?= JRoute::_('index.php?option=com_classificados&task=tipoProduto.lista',false) ?>" class="btn btn-primary">
 			<em class="icon icon-folder"></em> Tipos Produtos
 		</a>
 		<a href="#" class="btn btn-primary">
